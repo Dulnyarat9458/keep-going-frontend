@@ -39,3 +39,17 @@ input:-webkit-autofill {
   background-color: transparent !important;
   transition: background-color 9999s ease-in-out 0s;
 }
+
+html {
+  scrollbar-gutter: auto !important;
+}
+
+html:has(body.content-overflow-y) {
+  scrollbar-gutter: stable !important;
+}
+
+@supports (color: color-mix(in lab, red, red)) {
+    :where(:root:has(.modal-open, .modal[open], .modal:target, .modal-toggle:checked, .drawer:not(.drawer-open) > .drawer-toggle:checked)) {
+        --root-bg: oklch(20.84% 0.008 17.911);
+    }
+}
