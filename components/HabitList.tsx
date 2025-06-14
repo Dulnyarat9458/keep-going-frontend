@@ -1,76 +1,59 @@
 "use client"
 
-import React from 'react'
+import HabitForm from "./form/HabitForm"
+
 
 export default function HabitList() {
+  const items = ['a', 'b', 'c', 'd', 'e'];
   return (
     <>
-      {/* You can open the modal using document.getElementById('ID').showModal() method */}
-      <div className='text-end'>
-        <button className="btn" onClick={() => (document.getElementById('my_modal_3') as HTMLFormElement).showModal()}>open modal</button>
-        <dialog id="my_modal_3" className="modal">
+      <div className='text-end mx-4'>
+        <button className="btn btn-soft btn-primary" onClick={() => (document.getElementById('add_modal') as HTMLFormElement).showModal()}>Add Habits</button>
+        <dialog id="add_modal" className="modal">
           <div className="modal-box text-start">
             <form method="dialog">
               <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
             </form>
-            <h3 className="font-bold text-lg">Hello!</h3>
-            <p className="py-4">Press ESC key or click on ✕ button to close</p>
+            <h3 className="font-bold text-lg mb-4">Add Habits</h3>
+            <HabitForm />
           </div>
         </dialog>
       </div>
 
-      <ul className="list bg-base-100 rounded-box shadow-md">
+      <ul className="list rounded-box shadow-md bg-base-200 mt-4 mx-4">
+        {items.map((item, index) => (
+          <li className="flex justify-between p-4 " key={index}>
+            <div>
+              <div className="text-lg text-primary"><strong>Stop Smoking</strong></div>
+              <ul>
+                <li><strong>Streak: </strong><span className="text-info">4</span>  days</li>
+                <li><strong>Last Reset Date:</strong> 12 June 2024</li>
+              </ul>
+            </div>
+            <div >
+              <div className="dropdown dropdown-bottom dropdown-end">
+                <div tabIndex={0} role="button" className=" m-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block h-5 w-5 stroke-current"> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path> </svg>
+                </div>
+                <ul tabIndex={0} className="dropdown-content menu bg-base-300 rounded-box z-1 w-24 p-2 shadow-sm">
+                  <li>
+                    <div className="text-accent">Reset</div>
+                  </li>
+                  <li>
+                    <div className="text-warning">Edit</div>
+                  </li>
+                  <li>
+                    <div className="text-error">Delete</div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </li>
+        ))}
 
-        <li className="p-4 pb-2 text-xs opacity-60 tracking-wide">Most played songs this week</li>
 
-        <li className="list-row">
-          <div>
-            <div>Dio Lupa</div>
-            <div className="text-xs uppercase font-semibold opacity-60">Remaining Reason</div>
-          </div>
-          <p className="list-col-wrap text-xs">
-            "Remaining Reason" became an instant hit, praised for its haunting sound and emotional depth. A viral performance brought it widespread recognition, making it one of Dio Lupa’s most iconic tracks.
-          </p>
-          <button className="btn btn-square btn-ghost">
-            <svg className="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor"><path d="M6 3L20 12 6 21 6 3z"></path></g></svg>
-          </button>
-          <button className="btn btn-square btn-ghost">
-            <svg className="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></g></svg>
-          </button>
-        </li>
 
-        <li className="list-row">
 
-          <div>
-            <div>Ellie Beilish</div>
-            <div className="text-xs uppercase font-semibold opacity-60">Bears of a fever</div>
-          </div>
-          <p className="list-col-wrap text-xs">
-            "Bears of a Fever" captivated audiences with its intense energy and mysterious lyrics. Its popularity skyrocketed after fans shared it widely online, earning Ellie critical acclaim.
-          </p>
-          <button className="btn btn-square btn-ghost">
-            <svg className="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor"><path d="M6 3L20 12 6 21 6 3z"></path></g></svg>
-          </button>
-          <button className="btn btn-square btn-ghost">
-            <svg className="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></g></svg>
-          </button>
-        </li>
-
-        <li className="list-row">
-          <div>
-            <div>Sabrino Gardener</div>
-            <div className="text-xs uppercase font-semibold opacity-60">Cappuccino</div>
-          </div>
-          <p className="list-col-wrap text-xs">
-            "Cappuccino" quickly gained attention for its smooth melody and relatable themes. The song’s success propelled Sabrino into the spotlight, solidifying their status as a rising star.
-          </p>
-          <button className="btn btn-square btn-ghost">
-            <svg className="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor"><path d="M6 3L20 12 6 21 6 3z"></path></g></svg>
-          </button>
-          <button className="btn btn-square btn-ghost">
-            <svg className="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></g></svg>
-          </button>
-        </li>
 
       </ul>
       <div className='text-center mt-16'>

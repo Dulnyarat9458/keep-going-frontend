@@ -9,7 +9,7 @@ export default function SignInForm() {
       <input type="email" className="input" placeholder="Email" />
       <label className="label">Password</label>
       <input type="password" className="input" placeholder="Password" />
-      <Link href={"#"} className='link link-secondary text-end'>Forget Password</Link>
+      <Link href={"/forget-password"} className='link link-secondary text-end'>Forget Password</Link>
       <button className="btn btn-neutral mt-2">Sign In</button>
       <p className='text-center mt-2'>
         Don't have an Account?

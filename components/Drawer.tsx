@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import React from 'react'
 
 export default function Drawer() {
@@ -16,8 +17,7 @@ export default function Drawer() {
         <label htmlFor="my-drawer" aria-label="close sidebar" className="drawer-overlay"></label>
         <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4 max-w-[80%]">
           {/* Sidebar content here */}
-          <li className='mb-1'><a>Sidebar Item 1</a></li>
-          <li className='mb-1'><a>Sidebar Item 2</a></li>
+          <li className='mb-1'><Link href={"/signin"}>Log Out</Link></li>
         </ul>
       </div>
     </div>
