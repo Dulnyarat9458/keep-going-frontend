@@ -4,20 +4,24 @@ import Link from 'next/link'
 import React from 'react'
 
 import { useForm, Resolver } from "react-hook-form"
-import { yupResolver } from "@hookform/resolvers/yup"
-import * as yup from "yup"
+
+
+import * as z from "zod/v4";
+import { zodResolver } from '@hookform/resolvers/zod';
 
 export default function SignUpForm() {
 
-  const schema = yup
+  const schema = z
     .object({
-      firstName: yup.string().required(),
-      lastName: yup.string().required(),
-      email: yup.string().required().email(),
-      password: yup.string().required(),
-      confirmPassword: yup.string().required().oneOf([yup.ref('password')], 'not same password')
-    })
-    .required()
+      firstName: z.string().min(1, { message: 'Required' }),
+      lastName: z.string().min(1, { message: 'Required' }),
+      email: z.string().email().min(1, { message: 'Required' }),
+      password: z.string().min(6, { message: 'Required more than 6 character' }),
+      confirmPassword: z.string().min(1, { message: 'Required' })
+    }).refine((data) => data.password === data.confirmPassword, {
+      message: "Passwords do not match",
+      path: ["confirmPassword"],
+    });
 
   const {
     register,
@@ -25,7 +29,7 @@ export default function SignUpForm() {
     setValue,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(schema),
+    resolver: zodResolver(schema),
   })
 
   const onSubmit = (data: { [key: string]: string }) => {
@@ -35,34 +39,75 @@ export default function SignUpForm() {
 
   return (
 
-    <fieldset onSubmit={handleSubmit(onSubmit)} className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 m-auto">
+    <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 m-auto">
       <legend className="fieldset-legend">Sign Up</legend>
       <form onSubmit={handleSubmit(onSubmit)}>
 
-        <label className="label">First Name</label>
-        <input type="text" {...register('firstName')} className="input" placeholder="First Name" />
-        <p>{errors.firstName?.message}</p>
+        <div className='mb-2'>
+          <label className="label">First Name</label>
+          <input
+            {...register("firstName")}
+            className={`input ${errors.firstName?.message
+              ? "border-error focus:border-error focus:outline-0 focus:outline-error"
+              : ""
+              }`}
+            placeholder="First Name"
+          />
+          <p className='text-error'>{errors.firstName?.message}</p>
+        </div>
+        <div className='mb-2'>
+          <label className="label">Last Name</label>
+          <input
+            type="text" {...register('lastName')}
+            className={`input ${errors.lastName?.message
+              ? "border-error focus:border-error focus:outline-0 focus:outline-error"
+              : ""}`}
+            placeholder="Last Name"
+          />
+          <p className='text-error'>{errors.lastName?.message}</p>
+        </div>
 
-        <label className="label">Last Name</label>
-        <input type="text" {...register('lastName')} className="input" placeholder="Last Name" />
-        <p>{errors.lastName?.message}</p>
+        <div className='mb-2'>
+          <label className="label">Email</label>
+          <input
+            type="email" {...register('email')}
+            className={`input ${errors.email?.message
+              ? "border-error focus:border-error focus:outline-0 focus:outline-error"
+              : ""}`}
+            placeholder="Email"
+          />
+          <p className='text-error'>{errors.email?.message}</p>
+        </div>
 
-        <label className="label">Email</label>
-        <input type="email" {...register('email')} className="input" placeholder="Email" />
-        <p>{errors.email?.message}</p>
+        <div className='mb-2'>
+          <label className="label">Password</label>
+          <input
+            type="password" {...register('password')}
+            className={`input ${errors.password?.message
+              ? "border-error focus:border-error focus:outline-0 focus:outline-error"
+              : ""}`}
+            placeholder="Password"
+          />
+          <p className='text-error'>{errors.password?.message}</p>
+        </div>
 
-        <label className="label">Password</label>
-        <input type="password" {...register('password')} className="input" placeholder="Password" />
-        <p>{errors.password?.message}</p>
+        <div className='mb-2'>
+          <label className="label">Confirm Password</label>
+          <input
+            type="password" {...register('confirmPassword')}
+            className={`input ${errors.confirmPassword?.message
+              ? "border-error focus:border-error focus:outline-0 focus:outline-error"
+              : ""}`}
+            placeholder="Password"
+          />
+          <p className='text-error'>{errors.confirmPassword?.message}</p>
+        </div>
 
-        <label className="label">Confirm Password</label>
-        <input type="password" {...register('confirmPassword')} className="input" placeholder="Password" />
-        <p>{errors.confirmPassword?.message}</p>
 
         <button className="btn btn-neutral mt-2 w-full">Sign Up</button>
         <p className='text-center mt-2'>
           Already have an Account?
-          <button type='submit' className='link link-primary ml-1'>Sign In</button>
+          <Link href={"/signin"} type='submit' className='link link-primary ml-1'>Sign In</Link>
         </p>
       </form>
     </fieldset>

@@ -4,12 +4,14 @@ import { useState } from 'react'
 import { DayPicker } from "react-day-picker";
 import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
-import * as yup from "yup"
 
-const schema = yup
+import * as z from "zod/v4";
+import { zodResolver } from '@hookform/resolvers/zod';
+
+const schema = z
   .object({
-    title: yup.string().required(),
-    startDate: yup.date().required(),
+    title: z.string().min(1, { message: 'Required' }),
+    startDate: z.date().min(1, { message: 'Required' }),
   })
   .required()
 
@@ -20,7 +22,7 @@ export default function HabitForm() {
     setValue,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(schema),
+    resolver: zodResolver(schema),
   })
 
   const onSubmit = (data: any) => console.log(data)
