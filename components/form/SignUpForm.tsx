@@ -1,23 +1,37 @@
 "use client";
 
 import Link from 'next/link'
-import React from 'react'
 
-import { useForm, Resolver } from "react-hook-form"
+import { useForm } from "react-hook-form"
+import { snakeToCamel } from '@/utils/caseConverter'
 
 
 import * as z from "zod/v4";
 import { zodResolver } from '@hookform/resolvers/zod';
+import { errorTranslate } from '@/constants/errorMessages';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function SignUpForm() {
+  const router = useRouter();
+
+  const [loading, setLoading] = useState(false);
+
+  type RegisterForm = {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+  };
 
   const schema = z
     .object({
-      firstName: z.string().min(1, { message: 'Required' }),
-      lastName: z.string().min(1, { message: 'Required' }),
-      email: z.string().email().min(1, { message: 'Required' }),
+      firstName: z.string().min(1, { message: 'First Name is required' }),
+      lastName: z.string().min(1, { message: 'Last Name is required' }),
+      email: z.string().email().min(1, { message: 'Email is required' }),
       password: z.string().min(6, { message: 'Required more than 6 character' }),
-      confirmPassword: z.string().min(1, { message: 'Required' })
+      confirmPassword: z.string().min(1, { message: 'Confirm Password is required' })
     }).refine((data) => data.password === data.confirmPassword, {
       message: "Passwords do not match",
       path: ["confirmPassword"],
@@ -26,23 +40,55 @@ export default function SignUpForm() {
   const {
     register,
     handleSubmit,
-    setValue,
+    setError,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
   })
 
-  const onSubmit = (data: { [key: string]: string }) => {
-    console.log(data)
+  type inputError = {
+    error: string
+    field: string
+  }
+
+  const onSubmit = async (input: { [key: string]: string }) => {
+    setLoading(true);
+    const data = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/signup`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          first_name: input.firstName,
+          last_name: input.lastName,
+          email: input.email,
+          password: input.password,
+        }),
+      }
+    )
+
+    const posts = await data.json()
+
+    if (data.status === 200) {
+      router.push('/signin?message=signup_success');
+    } else {
+      posts.forEach((value: inputError) => {
+        if (value.field === "json") {
+          document.getElementById("error-modal")?.click();
+        } else {
+          setError(snakeToCamel(value.field) as keyof RegisterForm, {
+            type: "manual",
+            message: errorTranslate[value.error as string] || "Something went wrong",
+          });
+        }
+      });
+    }
+    setLoading(false);
   }
 
 
   return (
-
     <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 m-auto">
       <legend className="fieldset-legend">Sign Up</legend>
       <form onSubmit={handleSubmit(onSubmit)}>
-
         <div className='mb-2'>
           <label className="label">First Name</label>
           <input
@@ -66,7 +112,6 @@ export default function SignUpForm() {
           />
           <p className='text-error'>{errors.lastName?.message}</p>
         </div>
-
         <div className='mb-2'>
           <label className="label">Email</label>
           <input
@@ -78,7 +123,6 @@ export default function SignUpForm() {
           />
           <p className='text-error'>{errors.email?.message}</p>
         </div>
-
         <div className='mb-2'>
           <label className="label">Password</label>
           <input
@@ -90,7 +134,6 @@ export default function SignUpForm() {
           />
           <p className='text-error'>{errors.password?.message}</p>
         </div>
-
         <div className='mb-2'>
           <label className="label">Confirm Password</label>
           <input
@@ -103,14 +146,29 @@ export default function SignUpForm() {
           <p className='text-error'>{errors.confirmPassword?.message}</p>
         </div>
 
+        <button className="btn btn-neutral mt-2 w-full" disabled={loading}>
+          {
+            loading
+              ? <span className="loading loading-spinner loading-xs"></span>
+              : "Sign Up"
+          }
+        </button>
 
-        <button className="btn btn-neutral mt-2 w-full">Sign Up</button>
         <p className='text-center mt-2'>
           Already have an Account?
           <Link href={"/signin"} type='submit' className='link link-primary ml-1'>Sign In</Link>
         </p>
       </form>
+      <input type="checkbox" id="error-modal" className="modal-toggle" />
+      <div className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg text-error">Error</h3>
+          <p className="py-4">Something went wrong.</p>
+          <div className="modal-action">
+            <label htmlFor="error-modal" className="btn">Close</label>
+          </div>
+        </div>
+      </div>
     </fieldset>
-
   )
 }
