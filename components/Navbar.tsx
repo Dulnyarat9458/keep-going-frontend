@@ -1,9 +1,10 @@
 'use client';
 
-import { usePathname, useRouter } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
+import React from 'react'
 import Drawer from './Drawer'
 import Link from 'next/link'
+import { useAuth } from '@/contexts/AuthContext';
 
 const anonymousPath = [
   "/forget-password",
@@ -16,53 +17,9 @@ const mustShowDrawer = (path: string) => {
   return !anonymousPath.includes(path)
 }
 
-interface UserInfo {
-  firstName?: string
-  lastName?: string
-  email?: string
-}
-
 export default function Navbar() {
   const pathname = usePathname()
-  const router = useRouter();
-  const [userInfo, setUserInfo] = useState<UserInfo>({})
-
-  const fetchInfo = async () => {
-    const data = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/me`,
-      {
-        method: 'GET',
-        credentials: 'include',
-      }
-    )
-    return data
-  }
-
-  useEffect(() => {
-    if (!anonymousPath.includes(pathname)) {
-      const run = async () => {
-        const data = await fetchInfo()
-        const userInfo = await data.json()
-
-        if (data.status === 200) {
-          setUserInfo({
-            "firstName": userInfo.data.first_name,
-            "lastName": userInfo.data.last_name,
-            "email": userInfo.data.email,
-          })
-        } else {
-          if (data.status === 401) {
-            router.push('/signin');
-          } else {
-            document.getElementById("error-modal")?.click();
-          }
-        }
-      }
-      run()
-    } else {
-      setUserInfo({})
-    }
-  }, [pathname])
-
+  const { userInfo } = useAuth();
 
   return (
     <div className="navbar bg-base-100 shadow-sm">
