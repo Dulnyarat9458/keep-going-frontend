@@ -42,9 +42,10 @@ export default function SignInForm() {
 
   const onSubmit = async (input: { [key: string]: string }) => {
     setLoading(true);
-    const data = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/signin`,
+    const data = await fetch('api/signin',
       {
         method: 'POST',
+        credentials: 'include',
         body: JSON.stringify({
           email: input.email,
           password: input.password,

@@ -46,7 +46,7 @@ export default function ResetPasswordForm() {
     setLoading(true);
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
-    const data = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/reset-password`,
+    const data = await fetch('api/reset-password',
       {
         method: 'POST',
         body: JSON.stringify({

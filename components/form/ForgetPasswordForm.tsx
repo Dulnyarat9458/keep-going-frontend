@@ -40,7 +40,7 @@ export default function ForgetPasswordForm() {
 
   const onSubmit = async (input: { [key: string]: string }) => {
     setLoading(true);
-    const data = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/forget-password`,
+    const data = await fetch('api/forget-password',
       {
         method: 'POST',
         body: JSON.stringify({

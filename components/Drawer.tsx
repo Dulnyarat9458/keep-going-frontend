@@ -1,19 +1,31 @@
+"use client";
+
 import Link from 'next/link'
 import { useRouter } from 'next/navigation';
 import React from 'react'
 
-export default function Drawer() {
+interface UserInfo {
+  firstName?: string
+  lastName?: string
+  email?: string
+}
+
+interface DrawerProps {
+  userInfo: UserInfo
+}
+
+export default function Drawer({ userInfo }: DrawerProps) {
   const router = useRouter();
 
   const logout = async () => {
-    const data = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/signout`,
+    const data = await fetch(`api/signout`,
       {
         method: 'POST',
       }
     )
 
     if (data.status === 200) {
-      router.push('/');
+      router.push('/signin');
     } else {
       document.getElementById("error-modal")?.click();
     }
@@ -32,11 +44,25 @@ export default function Drawer() {
       </div>
       <div className="drawer-side ">
         <label htmlFor="my-drawer" aria-label="close sidebar" className="drawer-overlay"></label>
-        <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4 max-w-[80%]">
-          {/* Sidebar content here */}
-          <li className='mb-1'>
-            <button onClick={logout}>Log Out</button>
 
+
+
+        <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4 max-w-[80%] overflow-hidden">
+          <div className="p-3 mb-10">
+            <div className="w-full text-sm space-y-1">
+              <div className="font-medium truncate overflow-hidden whitespace-nowrap">
+                {userInfo.firstName || "Loading"} {userInfo.lastName || ""}
+              </div>
+              <div className="text-gray-500 truncate overflow-hidden whitespace-nowrap">
+                {userInfo.email || "Loading"}
+              </div>
+            </div>
+          </div>
+
+
+          {/* Sidebar content here */}
+          <li className="mb-1">
+            <button onClick={logout}>Log Out</button>
           </li>
         </ul>
       </div>

@@ -53,7 +53,7 @@ export default function SignUpForm() {
 
   const onSubmit = async (input: { [key: string]: string }) => {
     setLoading(true);
-    const data = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/signup`,
+    const data = await fetch('api/signup',
       {
         method: 'POST',
         body: JSON.stringify({
