@@ -40,7 +40,7 @@ export default function Drawer({ userInfo }: DrawerProps) {
             </div>
           </div>
           <li className="mb-1">
-            <button onClick={logout}>Log Out</button>
+            <button onClick={logout} className='text-error'>Log Out</button>
           </li>
         </ul>
       </div>
