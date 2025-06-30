@@ -5,7 +5,9 @@ import { createContext, useContext, useEffect, useState } from 'react'
 interface HabitContextType {
   habits: {}
   addHabit: (input: { [key: string]: string | Date }) => Promise<void>
+  editHabit: (input: { [key: string]: string | Date }, id: number) => Promise<void>
   resetHabit: (id: number) => Promise<void>
+  deleteHabit: (id: number) => Promise<void>
 }
 
 
@@ -13,8 +15,6 @@ const HabitContext = createContext<HabitContextType | undefined>(undefined)
 
 export function HabitProvider({ children }: { children: React.ReactNode }) {
   const [habits, setHabits] = useState<{}>({})
-
-
   const showConfirmModal = (message: string): Promise<boolean> => {
     return new Promise((resolve) => {
       const confirmText = document.getElementById("confirm-modal-text");
@@ -40,8 +40,6 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
     });
   }
 
-
-
   const fetchHabits = async () => {
     const data = await fetch('api/habits',
       {
@@ -50,6 +48,33 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
       }
     )
     return data
+  }
+
+  const deleteHabit = async (id: number) => {
+    const confirmed = await showConfirmModal("Are you sure you want to delete this habit?");
+    if (!confirmed) return;
+
+    const data = await fetch(`api/habits/${id}/`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+
+    if (data.status === 200) {
+      const res = await fetchHabits();
+      handleHabitList(res);
+      const text = document.getElementById("success-modal-text");
+      if (text) {
+        text.innerHTML = "Reset habit successfully";
+      }
+      (document.getElementById("confirm-modal") as HTMLInputElement).checked = false;
+      (document.getElementById("success-modal") as HTMLInputElement).checked = true;
+    } else {
+      const text = document.getElementById("error-modal-text");
+      if (text) {
+        text.innerHTML = "Reset failed.";
+      }
+      (document.getElementById("error-modal") as HTMLInputElement).checked = true;
+    }
   }
 
   const resetHabit = async (id: number) => {
@@ -104,6 +129,30 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const editHabit = async (input: { [key: string]: string | Date }, id: number) => {
+    const data = await fetch(`api/habits/${id}/`,
+      {
+        method: 'PATCH',
+        credentials: 'include',
+        body: JSON.stringify({
+          title: input.title,
+        }),
+      }
+    )
+
+    if (data.status === 200) {
+      const data = await fetchHabits();
+      handleHabitList(data)
+      document.getElementById("success-modal")?.click();
+      const text = document.getElementById("success-modal-text")!;
+      if (text) {
+        text.innerHTML = "Edit habit successfully";
+      }
+    } else {
+      document.getElementById("error-modal")?.click();
+    }
+  }
+
   const handleHabitList = async (data: Response) => {
     const habitsBody = await data.json();
     if (data.status === 200) {
@@ -127,8 +176,9 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
 
 
   return (
-    <HabitContext.Provider value={{ habits, addHabit, resetHabit }}>
+    <HabitContext.Provider value={{ habits, addHabit, editHabit, resetHabit, deleteHabit }}>
       {children}
+
       <input type="checkbox" id="error-modal" className="modal-toggle" />
       <div className="modal">
         <div className="modal-box">

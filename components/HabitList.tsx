@@ -2,6 +2,7 @@
 
 import { useHabit } from "@/contexts/HabitContext";
 import HabitForm from "./form/HabitForm"
+import { useState } from "react";
 
 interface HabitItem {
   created_at: Date
@@ -15,7 +16,8 @@ interface HabitItem {
 }
 
 export default function HabitList() {
-  const { habits, resetHabit } = useHabit();
+  const { habits, resetHabit, deleteHabit } = useHabit();
+  const [editingHabit, setEditingHabit] = useState<HabitItem | null>(null);
 
   const dayDiff = (date: Date): number => {
     const now = Date.now();
@@ -25,6 +27,7 @@ export default function HabitList() {
     return diffDays;
   };
 
+
   return (
     <>
       <div className="mt-8">
@@ -32,15 +35,19 @@ export default function HabitList() {
           <div className="flex justify-between items-center">
             <h2 className="text-3xl">Habit List</h2><button className="btn btn-soft btn-primary" onClick={() => (document.getElementById('add_modal') as HTMLFormElement).showModal()}>Add Habits</button>
           </div>
+
           <dialog id="add_modal" className="modal">
             <div className="modal-box text-start">
               <form method="dialog">
                 <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
               </form>
-              <h3 className="font-bold text-lg mb-4">Add Habits</h3>
+              <h3 className="font-bold text-lg mb-4">Add Habit</h3>
               <HabitForm />
             </div>
           </dialog>
+
+
+
         </div>
         <ul className="list rounded-box shadow-md bg-base-200 mt-4 mx-4">
           {
@@ -56,6 +63,8 @@ export default function HabitList() {
                         {new Date(item.last_reset_date).toLocaleDateString()}
                       </li>
                     </ul>
+
+
                   </div>
                   <div >
                     <div className="dropdown dropdown-bottom dropdown-end cursor-pointer">
@@ -67,10 +76,15 @@ export default function HabitList() {
                           <div className="text-accent" onClick={() => resetHabit(item.id)}>Reset</div>
                         </li>
                         <li>
-                          <div className="text-warning">Edit</div>
+                          <div className="text-warning" onClick={() => {
+                            setEditingHabit(item);
+                            (document.getElementById('edit_modal') as HTMLFormElement).showModal();
+                          }}>
+                            Edit
+                          </div>
                         </li>
                         <li>
-                          <div className="text-error">Delete</div>
+                          <div className="text-error" onClick={() => deleteHabit(item.id)}>Delete</div>
                         </li>
                       </ul>
                     </div>
@@ -90,6 +104,17 @@ export default function HabitList() {
           </div>
         </div>
       </div>
+
+      <dialog id="edit_modal" className="modal">
+        <div className="modal-box text-start">
+          <form method="dialog">
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+          </form>
+          <h3 className="font-bold text-lg mb-4">Edit Habit</h3>
+          {editingHabit && <HabitForm habitItem={editingHabit} />}
+        </div>
+      </dialog>
+
     </>
   )
 }
