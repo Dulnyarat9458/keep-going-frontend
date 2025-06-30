@@ -27,7 +27,6 @@ export default function HabitList() {
     return diffDays;
   };
 
-
   return (
     <>
       <div className="mt-8">

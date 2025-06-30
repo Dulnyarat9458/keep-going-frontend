@@ -14,6 +14,17 @@ interface UserInfo {
   email?: string
 }
 
+const anonymousPath = [
+  "/forget-password",
+  "/reset-password",
+  "/signin",
+  "/signup"
+]
+
+const anonymousAllow = (path: string) => {
+  return anonymousPath.includes(path)
+}
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -47,7 +58,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-
     const run = async () => {
       const data = await fetchInfo();
       const userInfo = await data.json()
@@ -60,7 +70,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         })
       } else {
         if (data.status === 401) {
-          router.push('/signin');
+          if (!anonymousAllow(pathname)) {
+            router.push('/signin');
+          }
         } else {
           document.getElementById("error-modal")?.click();
         }
