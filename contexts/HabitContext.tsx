@@ -5,6 +5,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 interface HabitContextType {
   habits: {}
   addHabit: (input: { [key: string]: string | Date }) => Promise<void>
+  resetHabit: (id: number) => Promise<void>
 }
 
 
@@ -12,6 +13,34 @@ const HabitContext = createContext<HabitContextType | undefined>(undefined)
 
 export function HabitProvider({ children }: { children: React.ReactNode }) {
   const [habits, setHabits] = useState<{}>({})
+
+
+  const showConfirmModal = (message: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+      const confirmText = document.getElementById("confirm-modal-text");
+      const okBtn = document.getElementById("confirm-modal-ok");
+      const closeBtn = document.getElementById("confirm-modal-close");
+      const checkbox = document.getElementById("confirm-modal") as HTMLInputElement;
+
+      if (confirmText) confirmText.innerText = message;
+      checkbox.checked = true;
+
+      const handle = (result: boolean) => {
+        checkbox.checked = false;
+        okBtn?.removeEventListener("click", okListener);
+        closeBtn?.removeEventListener("click", cancelListener);
+        resolve(result);
+      };
+
+      const okListener = () => handle(true);
+      const cancelListener = () => handle(false);
+
+      okBtn?.addEventListener("click", okListener);
+      closeBtn?.addEventListener("click", cancelListener);
+    });
+  }
+
+
 
   const fetchHabits = async () => {
     const data = await fetch('api/habits',
@@ -21,6 +50,33 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
       }
     )
     return data
+  }
+
+  const resetHabit = async (id: number) => {
+    const confirmed = await showConfirmModal("Are you sure you want to reset this habit?");
+    if (!confirmed) return;
+
+    const data = await fetch(`api/habits/${id}/reset/`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+
+    if (data.status === 200) {
+      const res = await fetchHabits();
+      handleHabitList(res);
+      const text = document.getElementById("success-modal-text");
+      if (text) {
+        text.innerHTML = "Reset habit successfully";
+      }
+      (document.getElementById("confirm-modal") as HTMLInputElement).checked = false;
+      (document.getElementById("success-modal") as HTMLInputElement).checked = true;
+    } else {
+      const text = document.getElementById("error-modal-text");
+      if (text) {
+        text.innerHTML = "Reset failed.";
+      }
+      (document.getElementById("error-modal") as HTMLInputElement).checked = true;
+    }
   }
 
   const addHabit = async (input: { [key: string]: string | Date }) => {
@@ -38,6 +94,11 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
     if (data.status === 200) {
       const data = await fetchHabits();
       handleHabitList(data)
+      document.getElementById("success-modal")?.click();
+      const text = document.getElementById("success-modal-text")!;
+      if (text) {
+        text.innerHTML = "Add habit successfully";
+      }
     } else {
       document.getElementById("error-modal")?.click();
     }
@@ -49,6 +110,10 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
       setHabits(habitsBody.data)
     } else {
       document.getElementById("error-modal")?.click();
+      const errorText = document.getElementById("error-modal-text")!;
+      if (errorText) {
+        errorText.innerHTML = "something went wrong.";
+      }
     }
   }
 
@@ -62,14 +127,38 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
 
 
   return (
-    <HabitContext.Provider value={{ habits, addHabit }}>
+    <HabitContext.Provider value={{ habits, addHabit, resetHabit }}>
       {children}
+      <input type="checkbox" id="error-modal" className="modal-toggle" />
       <div className="modal">
         <div className="modal-box">
           <h3 className="font-bold text-lg text-error">Error</h3>
-          <p className="py-4">Something went wrong.</p>
+          <p className="py-4" id="error-modal-text"></p>
           <div className="modal-action">
             <label htmlFor="error-modal" className="btn">Close</label>
+          </div>
+        </div>
+      </div>
+
+      <input type="checkbox" id="success-modal" className="modal-toggle" />
+      <div className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg text-success">Success</h3>
+          <p className="py-4" id="success-modal-text"></p>
+          <div className="modal-action">
+            <label htmlFor="success-modal" className="btn">Close</label>
+          </div>
+        </div>
+      </div>
+
+      <input type="checkbox" id="confirm-modal" className="modal-toggle" />
+      <div className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg text-primary">Confirmation</h3>
+          <p className="py-4" id="confirm-modal-text"></p>
+          <div className="modal-action">
+            <label htmlFor="confirm-modal" className="btn btn-primary" id="confirm-modal-ok">OK</label>
+            <label htmlFor="confirm-modal" className="btn" id="confirm-modal-close">Close</label>
           </div>
         </div>
       </div>
