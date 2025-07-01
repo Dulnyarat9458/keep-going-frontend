@@ -1,4 +1,21 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Keep Going Frontend (Habit Tracker)
+
+This is a simple frontend service for a Habit Tracker Web application.  
+It provides frontend for user authentication and habit management.
+
+## Features
+
+- User registration, login, and forgot password
+- Create, update, and delete habits
+- Track daily habit progress
+
+## Tech Stack
+
+- Next.js (React)
+- Zod
+- React Hook Form
+- Tailwind CSS
+- Daisy UI
 
 ## Getting Started
 
