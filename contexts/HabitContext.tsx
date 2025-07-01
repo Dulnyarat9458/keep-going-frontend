@@ -2,8 +2,20 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 
+interface HabitItem {
+  id: number
+  title: string
+  user_id: number
+  created_at: Date
+  deleted_at: Date
+  last_reset_date: Date
+  start_date: Date
+  updated_at: Date
+}
+
+
 interface HabitContextType {
-  habits: {}
+  habits: HabitItem[]
   addHabit: (input: { [key: string]: string | Date }) => Promise<void>
   editHabit: (input: { [key: string]: string | Date }, id: number) => Promise<void>
   resetHabit: (id: number) => Promise<void>
@@ -14,7 +26,7 @@ interface HabitContextType {
 const HabitContext = createContext<HabitContextType | undefined>(undefined)
 
 export function HabitProvider({ children }: { children: React.ReactNode }) {
-  const [habits, setHabits] = useState<{}>({})
+  const [habits, setHabits] = useState<HabitItem[]>([])
   const showConfirmModal = (message: string): Promise<boolean> => {
     return new Promise((resolve) => {
       const confirmText = document.getElementById("confirm-modal-text");
@@ -109,6 +121,9 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
       {
         method: 'POST',
         credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           title: input.title,
           start_date: input.startDate,
@@ -125,6 +140,8 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
         text.innerHTML = "Add habit successfully";
       }
     } else {
+
+      console.log(await data.json())
       document.getElementById("error-modal")?.click();
     }
   }

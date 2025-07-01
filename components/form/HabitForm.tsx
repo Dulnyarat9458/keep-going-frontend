@@ -3,8 +3,6 @@
 import { useEffect, useState } from 'react'
 import { DayPicker } from "react-day-picker";
 import { useForm } from "react-hook-form"
-import { yupResolver } from "@hookform/resolvers/yup"
-
 import * as z from "zod/v4";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useHabit } from '@/contexts/HabitContext';
@@ -50,7 +48,6 @@ export default function HabitForm({ habitItem }: { habitItem?: HabitItem }) {
     if (habitItem) {
       await editHabit(input, habitItem.id);
       (document.getElementById('edit_modal') as HTMLFormElement).close()
-
     } else {
       await addHabit(input)
       reset();
@@ -86,31 +83,33 @@ export default function HabitForm({ habitItem }: { habitItem?: HabitItem }) {
             placeholder="Title"
           />
           <p className='text-error'>{errors.title?.message}</p>
-          {(!habitItem?.id) ?
-            <>
-              <label className="label">Start Date</label>
+          {
+            (!habitItem?.id) ?
               <>
-                <button type='button' popoverTarget="rdp-popover" className="input input-border w-full" style={{ anchorName: "--rdp" } as React.CSSProperties}>
-                  {startDate ? startDate.toLocaleDateString() : "Pick a date"}
-                </button>
-                <div popover="auto" id="rdp-popover" className="dropdown" style={{ positionAnchor: "--rdp" } as React.CSSProperties}>
-                  <DayPicker
-                    className="react-day-picker"
-                    mode="single"
-                    selected={startDate}
-                    onSelect={(selectedDate) => {
-                      if (selectedDate) {
-                        setStartDate(selectedDate)
-                        setValue("startDate", selectedDate)
-                      }
-                    }}
-                  />
-                </div>
-                <p className='text-error'>{errors.startDate?.message}</p>
+                <label className="label">Start Date</label>
+                <>
+                  <button type='button' popoverTarget="rdp-popover" className="input input-border w-full" style={{ anchorName: "--rdp" } as React.CSSProperties}>
+                    {startDate ? startDate.toLocaleDateString() : "Pick a date"}
+                  </button>
+                  <div popover="auto" id="rdp-popover" className="dropdown" style={{ positionAnchor: "--rdp" } as React.CSSProperties}>
+                    <DayPicker
+                      className="react-day-picker"
+                      mode="single"
+                      selected={startDate}
+                      onSelect={(selectedDate) => {
+                        if (selectedDate) {
+                          setStartDate(selectedDate)
+                          setValue("startDate", selectedDate)
+                        }
+                      }}
+                      disabled={{ after: new Date() }}
+                    />
+                  </div>
+                  <p className='text-error'>{errors.startDate?.message}</p>
+                </>
               </>
-            </>
-            : <></>}
-
+              : <></>
+          }
         </fieldset>
         <input type="submit" className="btn btn-primary w-full" value={"ok"} />
       </form>
