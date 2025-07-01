@@ -25,7 +25,7 @@ export default function Navbar() {
   const { userInfo } = useAuth();
 
   return (
-    <div className="navbar sticky top-0 z-10 bg-base-100 shadow-sm bg-base-300">
+    <div className="navbar sticky top-0 z-10 shadow-sm bg-base-300">
       <div className="flex-none">
         {mustShowDrawer(pathname) && <Drawer userInfo={userInfo} />}
       </div>
