@@ -1,9 +1,9 @@
 "use client";
 
-import { useAuth } from '@/contexts/AuthContext';
-import Link from 'next/link'
-import { useRouter } from 'next/navigation';
 import React from 'react'
+
+import { useAuth } from '@/contexts/AuthContext';
+
 
 interface UserInfo {
   firstName?: string
