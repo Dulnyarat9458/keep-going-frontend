@@ -1,8 +1,8 @@
 "use client";
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation';
-import React, { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react'
 
 import z from 'zod/v4';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,6 +13,8 @@ import { snakeToCamel } from '@/utils/caseConverter';
 
 
 export default function SignInForm() {
+  const searchParams = useSearchParams()
+  const message = searchParams.get('message')
 
   const router = useRouter();
 
@@ -85,6 +87,14 @@ export default function SignInForm() {
     setLoading(false);
   }
 
+  useEffect(() => {
+    if (message) {
+      const modal = document.getElementById("success-modal") as HTMLInputElement
+      if (modal) {
+        modal.checked = true
+      }
+    }
+  }, [message])
 
   return (
     <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 m-auto">
@@ -132,6 +142,16 @@ export default function SignInForm() {
           <p className="py-4">Something went wrong.</p>
           <div className="modal-action">
             <label htmlFor="error-modal" className="btn">Close</label>
+          </div>
+        </div>
+      </div>
+      <input type="checkbox" id="success-modal" className="modal-toggle" />
+      <div className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg text-success">Success</h3>
+          <p className="py-4">Register Success</p>
+          <div className="modal-action">
+            <label htmlFor="success-modal" className="btn">Close</label>
           </div>
         </div>
       </div>
