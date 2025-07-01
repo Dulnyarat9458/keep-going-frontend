@@ -6,7 +6,7 @@ import ForgetPasswordForm from '@/components/form/ForgetPasswordForm'
 export default function ForgetPassword() {
   return (
     <div className='h-screen w-full flex'>
-      <ForgetPasswordForm/>
+      <ForgetPasswordForm />
     </div>
   )
 }
