@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 
-import * as z from "zod/v4";
 import { DayPicker } from "react-day-picker";
 import { useForm } from "react-hook-form"
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,40 +9,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useHabit } from '@/contexts/HabitContext';
 import { snakeToCamel } from '@/utils/caseConverter';
 import { errorTranslate } from '@/constants/errorMessages';
-
-
-interface HabitItem {
-  id: number
-  title: string
-  user_id: number
-  created_at: Date
-  deleted_at: Date
-  last_reset_date: Date
-  start_date: Date
-  updated_at: Date
-}
-
-type inputError = {
-  error: string
-  field: string
-}
-
-type FormValues = {
-  title: string;
-  startDate?: Date;
-};
+import { HabitInput, inputError } from '@/types/form';
+import { HabitItem } from '@/types/habit';
+import { AddHabitSchema, EditHabitSchema } from '@/schemas/forms';
 
 export default function HabitForm({ habitItem }: { habitItem?: HabitItem }) {
-
   const schema = habitItem
-    ? z.object({
-      title: z.string().min(1, { message: 'Required' }),
-      startDate: z.date().optional(),
-    })
-    : z.object({
-      title: z.string().optional(),
-      startDate: z.date().optional(),
-    });
+    ? EditHabitSchema
+    : AddHabitSchema
 
   const {
     register,
@@ -60,18 +33,16 @@ export default function HabitForm({ habitItem }: { habitItem?: HabitItem }) {
   const { addHabit, editHabit } = useHabit();
 
   const onSubmit = async (input: { [key: string]: string | Date }) => {
-
     if (habitItem) {
       const error = await editHabit(input, habitItem.id);
       if (error) {
-
         error.forEach((value: inputError) => {
           if (value.field === "json") {
             document.getElementById("error-modal")?.click();
           } else {
             error.forEach((value: inputError) => {
               const fieldName = snakeToCamel(value.field.trim());
-              setError(fieldName as keyof FormValues, {
+              setError(fieldName as keyof HabitInput, {
                 type: "manual",
                 message: errorTranslate[value.error] || "Something went wrong",
               });
@@ -81,11 +52,8 @@ export default function HabitForm({ habitItem }: { habitItem?: HabitItem }) {
       } else {
         (document.getElementById('edit_modal') as HTMLFormElement).close()
       }
-
-
     } else {
       const error = await addHabit(input)
-
       if (error) {
         error.forEach((value: inputError) => {
           if (value.field === "json") {
@@ -93,7 +61,7 @@ export default function HabitForm({ habitItem }: { habitItem?: HabitItem }) {
           } else {
             error.forEach((value: inputError) => {
               const fieldName = snakeToCamel(value.field.trim());
-              setError(fieldName as keyof FormValues, {
+              setError(fieldName as keyof HabitInput, {
                 type: "manual",
                 message: errorTranslate[value.error] || "Something went wrong",
               });
@@ -106,7 +74,6 @@ export default function HabitForm({ habitItem }: { habitItem?: HabitItem }) {
         (document.getElementById('add_modal') as HTMLFormElement).close()
       }
     }
-
   }
 
   const [startDate, setStartDate] = useState<Date | undefined>();
@@ -136,7 +103,8 @@ export default function HabitForm({ habitItem }: { habitItem?: HabitItem }) {
           />
           <p className='text-error'>{errors.title?.message}</p>
           {
-            (!habitItem?.id) ?
+            (!habitItem?.id)
+              ?
               <>
                 <label className="label">Start Date</label>
                 <>
@@ -160,7 +128,8 @@ export default function HabitForm({ habitItem }: { habitItem?: HabitItem }) {
                   <p className='text-error'>{errors.startDate?.message}</p>
                 </>
               </>
-              : <></>
+              :
+              <></>
           }
         </fieldset>
         <input type="submit" className="btn btn-primary w-full" value={"ok"} />

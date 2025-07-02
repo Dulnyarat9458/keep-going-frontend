@@ -10,32 +10,15 @@ import { useForm } from "react-hook-form"
 
 import { snakeToCamel } from '@/utils/caseConverter'
 import { errorTranslate } from '@/constants/errorMessages';
+import { inputError, SignUpFormInput } from '@/types/form';
+import { SignUpSchema } from '@/schemas/forms';
 
 
 export default function SignUpForm() {
   const router = useRouter();
-
   const [loading, setLoading] = useState(false);
 
-  type RegisterForm = {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-  };
-
-  const schema = z
-    .object({
-      firstName: z.string().min(1, { message: 'First Name is required' }),
-      lastName: z.string().min(1, { message: 'Last Name is required' }),
-      email: z.string().email().min(1, { message: 'Email is required' }),
-      password: z.string().min(6, { message: 'Required more than 6 character' }),
-      confirmPassword: z.string().min(1, { message: 'Confirm Password is required' })
-    }).refine((data) => data.password === data.confirmPassword, {
-      message: "Passwords do not match",
-      path: ["confirmPassword"],
-    });
+  const schema = SignUpSchema
 
   const {
     register,
@@ -46,10 +29,6 @@ export default function SignUpForm() {
     resolver: zodResolver(schema),
   })
 
-  type inputError = {
-    error: string
-    field: string
-  }
 
   const onSubmit = async (input: { [key: string]: string }) => {
     setLoading(true);
@@ -74,7 +53,7 @@ export default function SignUpForm() {
         if (value.field === "json") {
           document.getElementById("error-modal")?.click();
         } else {
-          setError(snakeToCamel(value.field) as keyof RegisterForm, {
+          setError(snakeToCamel(value.field) as keyof SignUpFormInput, {
             type: "manual",
             message: errorTranslate[value.error as string] || "Something went wrong",
           });

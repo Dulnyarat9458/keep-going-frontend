@@ -6,15 +6,8 @@ import Link from 'next/link'
 
 import { useAuth } from '@/contexts/AuthContext';
 import Drawer from './Drawer'
+import { anonymousPath } from '@/constants/anonymousPath';
 
-
-
-const anonymousPath = [
-  "/forget-password",
-  "/reset-password",
-  "/signin",
-  "/signup"
-]
 
 const mustShowDrawer = (path: string) => {
   return !anonymousPath.includes(path)
