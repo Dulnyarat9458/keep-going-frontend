@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-import * as z from "zod/v4";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from "react-hook-form"
 
