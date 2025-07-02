@@ -1,12 +1,10 @@
 "use client";
 
-import Link from 'next/link'
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react'
-
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-
+import { zodResolver } from '@hookform/resolvers/zod';
 import { errorTranslate } from '@/constants/errorMessages';
 import { snakeToCamel } from '@/utils/caseConverter';
 import { inputError, SignInFormInput } from '@/types/form';
@@ -14,15 +12,16 @@ import { SignInSchema } from '@/schemas/forms';
 
 
 export default function SignInForm() {
-  const searchParams = useSearchParams()
-  const message = searchParams.get('message')
-
+  // Hooks
   const router = useRouter();
-
+  const searchParams = useSearchParams();
+  const message = searchParams.get('message');
   const [loading, setLoading] = useState(false);
 
+  // Schema
   const schema = SignInSchema
 
+  // Form
   const {
     register,
     handleSubmit,

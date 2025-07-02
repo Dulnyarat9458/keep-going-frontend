@@ -2,10 +2,8 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation';
-
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-
 import { errorTranslate } from '@/constants/errorMessages';
 import { snakeToCamel } from '@/utils/caseConverter';
 import { ForgetPasswordFormInput, inputError } from '@/types/form';

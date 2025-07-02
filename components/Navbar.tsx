@@ -3,11 +3,9 @@
 import React from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-
 import { useAuth } from '@/contexts/AuthContext';
 import Drawer from './Drawer'
 import { anonymousPath } from '@/constants/anonymousPath';
-
 
 const mustShowDrawer = (path: string) => {
   return !anonymousPath.includes(path)
@@ -27,7 +25,6 @@ export default function Navbar() {
           <Link href={"/"} className="btn btn-ghost text-xl">MY HABITS</Link>
           <div className='mr-4 hidden lg:block'>{userInfo.firstName} {userInfo.lastName}</div>
         </div>
-
       </div>
       <div className="modal">
         <div className="modal-box">

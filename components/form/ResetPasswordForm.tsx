@@ -1,8 +1,7 @@
 "use client";
 
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react'
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
@@ -13,11 +12,14 @@ import { ResetPasswordSchema } from '@/schemas/forms';
 
 
 export default function ResetPasswordForm() {
+  // Hooks
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const schema = ResetPasswordSchema
+  // Schema
+  const schema = ResetPasswordSchema;
 
+  // Form
   const {
     register,
     handleSubmit,
@@ -25,24 +27,22 @@ export default function ResetPasswordForm() {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
-  })
+  });
 
-
+  // Handlers
   const onSubmit = async (input: { [key: string]: string }) => {
     setLoading(true);
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
-    const data = await fetch('api/reset-password',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          token: token,
-          password: input.password,
-        }),
-      }
-    )
+    const data = await fetch('api/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({
+        token: token,
+        password: input.password,
+      }),
+    });
 
-    const posts = await data.json()
+    const posts = await data.json();
 
     if (data.status === 200) {
       router.push('/signin?message=signup_success');
@@ -59,9 +59,9 @@ export default function ResetPasswordForm() {
       });
     }
     setLoading(false);
-  }
+  };
 
-
+  // Render
   return (
     <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 m-auto">
       <legend className="fieldset-legend">Reset Password</legend>
@@ -108,5 +108,5 @@ export default function ResetPasswordForm() {
         </div>
       </div>
     </fieldset>
-  )
+  );
 }

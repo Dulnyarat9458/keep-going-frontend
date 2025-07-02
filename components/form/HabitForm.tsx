@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useState } from 'react'
-
 import { DayPicker } from "react-day-picker";
 import { useForm } from "react-hook-form"
 import { zodResolver } from '@hookform/resolvers/zod';
-
 import { useHabit } from '@/contexts/HabitContext';
 import { snakeToCamel } from '@/utils/caseConverter';
 import { errorTranslate } from '@/constants/errorMessages';
@@ -14,10 +12,7 @@ import { HabitItem } from '@/types/habit';
 import { AddHabitSchema, EditHabitSchema } from '@/schemas/forms';
 
 export default function HabitForm({ habitItem }: { habitItem?: HabitItem }) {
-  const schema = habitItem
-    ? EditHabitSchema
-    : AddHabitSchema
-
+  const schema = habitItem ? EditHabitSchema : AddHabitSchema
   const {
     register,
     handleSubmit,
@@ -29,9 +24,7 @@ export default function HabitForm({ habitItem }: { habitItem?: HabitItem }) {
     resolver: zodResolver(schema),
     shouldUnregister: true,
   })
-
   const { addHabit, editHabit } = useHabit();
-
   const onSubmit = async (input: { [key: string]: string | Date }) => {
     if (habitItem) {
       const error = await editHabit(input, habitItem.id);
@@ -69,8 +62,6 @@ export default function HabitForm({ habitItem }: { habitItem?: HabitItem }) {
           }
         });
       } else {
-        reset();
-        setStartDate(undefined);
         (document.getElementById('add_modal') as HTMLFormElement).close()
       }
     }
@@ -99,6 +90,7 @@ export default function HabitForm({ habitItem }: { habitItem?: HabitItem }) {
             className={`input w-full ${errors.title?.message}
               ? "border-error focus:border-error focus:outline-0 focus:outline-error"
               : ""}`}
+
             placeholder="Title"
           />
           <p className='text-error'>{errors.title?.message}</p>
