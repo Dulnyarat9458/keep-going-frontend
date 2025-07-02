@@ -12,16 +12,14 @@ import { SignInSchema } from '@/schemas/forms';
 
 
 export default function SignInForm() {
-  // Hooks
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const message = searchParams.get('message');
   const [loading, setLoading] = useState(false);
 
-  // Schema
   const schema = SignInSchema
 
-  // Form
   const {
     register,
     handleSubmit,

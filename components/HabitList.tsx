@@ -58,8 +58,6 @@ export default function HabitList() {
                           {new Date(item.last_reset_date).toLocaleDateString()}
                         </li>
                       </ul>
-
-
                     </div>
                     <div >
                       <div className="dropdown dropdown-bottom dropdown-end cursor-pointer">
