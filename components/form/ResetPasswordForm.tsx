@@ -1,35 +1,25 @@
 "use client";
 
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react'
-
-import z from 'zod/v4';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 import { errorTranslate } from '@/constants/errorMessages';
 import { snakeToCamel } from '@/utils/caseConverter';
+import { inputError, ResetPasswordFormInput } from '@/types/form';
+import { ResetPasswordSchema } from '@/schemas/forms';
 
 
 export default function ResetPasswordForm() {
+  // Hooks
   const router = useRouter();
-
   const [loading, setLoading] = useState(false);
 
-  type RegisterForm = {
-    password: string;
-    confirmPassword: string;
-  };
+  // Schema
+  const schema = ResetPasswordSchema;
 
-  const schema = z
-    .object({
-      password: z.string().min(6, { message: 'Required more than 6 character' }),
-      confirmPassword: z.string().min(1, { message: 'Confirm Password is required' })
-    }).refine((data) => data.password === data.confirmPassword, {
-      message: "Passwords do not match",
-      path: ["confirmPassword"],
-    });
-
+  // Form
   const {
     register,
     handleSubmit,
@@ -37,28 +27,22 @@ export default function ResetPasswordForm() {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
-  })
+  });
 
-  type inputError = {
-    error: string
-    field: string
-  }
-
+  // Handlers
   const onSubmit = async (input: { [key: string]: string }) => {
     setLoading(true);
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
-    const data = await fetch('api/reset-password',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          token: token,
-          password: input.password,
-        }),
-      }
-    )
+    const data = await fetch('api/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({
+        token: token,
+        password: input.password,
+      }),
+    });
 
-    const posts = await data.json()
+    const posts = await data.json();
 
     if (data.status === 200) {
       router.push('/signin?message=signup_success');
@@ -67,7 +51,7 @@ export default function ResetPasswordForm() {
         if (value.field === "json") {
           document.getElementById("error-modal")?.click();
         } else {
-          setError(snakeToCamel(value.field) as keyof RegisterForm, {
+          setError(snakeToCamel(value.field) as keyof ResetPasswordFormInput, {
             type: "manual",
             message: errorTranslate[value.error as string] || "Something went wrong",
           });
@@ -75,9 +59,7 @@ export default function ResetPasswordForm() {
       });
     }
     setLoading(false);
-  }
-
-
+  };
   return (
     <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 m-auto">
       <legend className="fieldset-legend">Reset Password</legend>
@@ -124,5 +106,5 @@ export default function ResetPasswordForm() {
         </div>
       </div>
     </fieldset>
-  )
+  );
 }

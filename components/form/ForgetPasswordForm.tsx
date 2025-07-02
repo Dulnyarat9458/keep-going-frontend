@@ -2,29 +2,19 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation';
-
-import { z } from 'zod/v4';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-
 import { errorTranslate } from '@/constants/errorMessages';
 import { snakeToCamel } from '@/utils/caseConverter';
+import { ForgetPasswordFormInput, inputError } from '@/types/form';
+import { ForgetPasswordSchema } from '@/schemas/forms';
 
 
 export default function ForgetPasswordForm() {
-
   const router = useRouter();
-
   const [loading, setLoading] = useState(false);
 
-  type RegisterForm = {
-    email: string;
-  };
-
-  const schema = z
-    .object({
-      email: z.string().email().min(1, { message: 'Email is required' }),
-    })
+  const schema = ForgetPasswordSchema
 
   const {
     register,
@@ -34,11 +24,6 @@ export default function ForgetPasswordForm() {
   } = useForm({
     resolver: zodResolver(schema),
   })
-
-  type inputError = {
-    error: string
-    field: string
-  }
 
   const onSubmit = async (input: { [key: string]: string }) => {
     setLoading(true);
@@ -60,7 +45,7 @@ export default function ForgetPasswordForm() {
           if (value.field === "json") {
             document.getElementById("error-modal")?.click();
           } else {
-            setError(snakeToCamel(value.field) as keyof RegisterForm, {
+            setError(snakeToCamel(value.field) as keyof ForgetPasswordFormInput, {
               type: "manual",
               message: errorTranslate[value.error as string] || "Something went wrong",
             });
@@ -70,7 +55,7 @@ export default function ForgetPasswordForm() {
         if (posts.field === "json") {
           document.getElementById("error-modal")?.click();
         } else {
-          setError(snakeToCamel(posts.field) as keyof RegisterForm, {
+          setError(snakeToCamel(posts.field) as keyof ForgetPasswordFormInput, {
             type: "manual",
             message: errorTranslate[posts.error as string] || "Something went wrong",
           });
@@ -79,7 +64,6 @@ export default function ForgetPasswordForm() {
     }
     setLoading(false);
   }
-
 
   return (
     <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 m-auto">

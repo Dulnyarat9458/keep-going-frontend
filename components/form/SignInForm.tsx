@@ -1,35 +1,24 @@
 "use client";
 
-import Link from 'next/link'
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react'
-
-import z from 'zod/v4';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-
+import { zodResolver } from '@hookform/resolvers/zod';
 import { errorTranslate } from '@/constants/errorMessages';
 import { snakeToCamel } from '@/utils/caseConverter';
+import { inputError, SignInFormInput } from '@/types/form';
+import { SignInSchema } from '@/schemas/forms';
 
 
 export default function SignInForm() {
-  const searchParams = useSearchParams()
-  const message = searchParams.get('message')
 
   const router = useRouter();
-
+  const searchParams = useSearchParams();
+  const message = searchParams.get('message');
   const [loading, setLoading] = useState(false);
 
-  type RegisterForm = {
-    email: string;
-    password: string;
-  };
-
-  const schema = z
-    .object({
-      email: z.string().email().min(1, { message: 'Email is required' }),
-      password: z.string().min(6, { message: 'Required more than 6 character' }),
-    })
+  const schema = SignInSchema
 
   const {
     register,
@@ -40,10 +29,6 @@ export default function SignInForm() {
     resolver: zodResolver(schema),
   })
 
-  type inputError = {
-    error: string
-    field: string
-  }
 
   const onSubmit = async (input: { [key: string]: string }) => {
     setLoading(true);
@@ -67,7 +52,7 @@ export default function SignInForm() {
           if (value.field === "json") {
             document.getElementById("error-modal")?.click();
           } else {
-            setError(snakeToCamel(value.field) as keyof RegisterForm, {
+            setError(snakeToCamel(value.field) as keyof SignInFormInput, {
               type: "manual",
               message: errorTranslate[value.error as string] || "Something went wrong",
             });
@@ -77,7 +62,7 @@ export default function SignInForm() {
         if (posts.field === "json") {
           document.getElementById("error-modal")?.click();
         } else {
-          setError(snakeToCamel(posts.field) as keyof RegisterForm, {
+          setError(snakeToCamel(posts.field) as keyof SignInFormInput, {
             type: "manual",
             message: errorTranslate[posts.error as string] || "Something went wrong",
           });

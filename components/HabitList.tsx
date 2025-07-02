@@ -4,18 +4,8 @@ import { useState } from "react";
 
 import { useHabit } from "@/contexts/HabitContext";
 import HabitForm from "./form/HabitForm"
+import { HabitItem } from "@/types/habit";
 
-
-interface HabitItem {
-  id: number
-  title: string
-  user_id: number
-  created_at: Date
-  deleted_at: Date
-  last_reset_date: Date
-  start_date: Date
-  updated_at: Date
-}
 
 const ITEMS_PER_PAGE = 10
 
@@ -68,8 +58,6 @@ export default function HabitList() {
                           {new Date(item.last_reset_date).toLocaleDateString()}
                         </li>
                       </ul>
-
-
                     </div>
                     <div >
                       <div className="dropdown dropdown-bottom dropdown-end cursor-pointer">

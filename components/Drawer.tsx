@@ -1,21 +1,10 @@
 "use client";
 
 import React from 'react'
-
 import { useAuth } from '@/contexts/AuthContext';
+import { UserInfo } from '@/types/user';
 
-
-interface UserInfo {
-  firstName?: string
-  lastName?: string
-  email?: string
-}
-
-interface DrawerProps {
-  userInfo: UserInfo
-}
-
-export default function Drawer({ userInfo }: DrawerProps) {
+export default function Drawer({ userInfo }: { userInfo: UserInfo }) {
   const { logout } = useAuth();
 
   return (

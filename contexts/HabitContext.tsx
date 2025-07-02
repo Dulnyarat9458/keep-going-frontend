@@ -16,12 +16,16 @@ interface HabitItem {
 
 interface HabitContextType {
   habits: HabitItem[]
-  addHabit: (input: { [key: string]: string | Date }) => Promise<void>
-  editHabit: (input: { [key: string]: string | Date }, id: number) => Promise<void>
+  addHabit: (input: { [key: string]: string | Date }) => Promise<inputError[] | null>
+  editHabit: (input: { [key: string]: string | Date }, id: number) => Promise<inputError[] | null>
   resetHabit: (id: number) => Promise<void>
   deleteHabit: (id: number) => Promise<void>
 }
 
+type inputError = {
+  error: string
+  field: string
+}
 
 const HabitContext = createContext<HabitContextType | undefined>(undefined)
 
@@ -100,8 +104,8 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
 
     if (data.status === 200) {
       const res = await fetchHabits();
-      handleHabitList(res);
       const text = document.getElementById("success-modal-text");
+      handleHabitList(res);
       if (text) {
         text.innerHTML = "Reset habit successfully";
       }
@@ -116,7 +120,7 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const addHabit = async (input: { [key: string]: string | Date }) => {
+  const addHabit = async (input: { [key: string]: string | Date }): Promise<inputError[] | null> => {
     const data = await fetch('api/habits',
       {
         method: 'POST',
@@ -139,14 +143,13 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
       if (text) {
         text.innerHTML = "Add habit successfully";
       }
+      return null
     } else {
-
-      console.log(await data.json())
-      document.getElementById("error-modal")?.click();
+      return data.json()
     }
   }
 
-  const editHabit = async (input: { [key: string]: string | Date }, id: number) => {
+  const editHabit = async (input: { [key: string]: string | Date }, id: number): Promise<inputError[] | null> => {
     const data = await fetch(`api/habits/${id}/`,
       {
         method: 'PATCH',
@@ -165,8 +168,10 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
       if (text) {
         text.innerHTML = "Edit habit successfully";
       }
+      return null
     } else {
-      document.getElementById("error-modal")?.click();
+      return data.json()
+      // document.getElementById("error-modal")?.click();
     }
   }
 
@@ -195,7 +200,6 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
   return (
     <HabitContext.Provider value={{ habits, addHabit, editHabit, resetHabit, deleteHabit }}>
       {children}
-
       <input type="checkbox" id="error-modal" className="modal-toggle" />
       <div className="modal">
         <div className="modal-box">
@@ -206,7 +210,6 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </div>
-
       <input type="checkbox" id="success-modal" className="modal-toggle" />
       <div className="modal">
         <div className="modal-box">
@@ -217,7 +220,6 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </div>
-
       <input type="checkbox" id="confirm-modal" className="modal-toggle" />
       <div className="modal">
         <div className="modal-box">

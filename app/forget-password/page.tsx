@@ -1,7 +1,5 @@
 import React from 'react'
-
 import ForgetPasswordForm from '@/components/form/ForgetPasswordForm'
-
 
 export default function ForgetPassword() {
   return (
