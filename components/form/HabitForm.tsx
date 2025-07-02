@@ -8,6 +8,8 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { useHabit } from '@/contexts/HabitContext';
+import { snakeToCamel } from '@/utils/caseConverter';
+import { errorTranslate } from '@/constants/errorMessages';
 
 
 interface HabitItem {
@@ -21,6 +23,16 @@ interface HabitItem {
   updated_at: Date
 }
 
+type inputError = {
+  error: string
+  field: string
+}
+
+type FormValues = {
+  title: string;
+  startDate?: Date;
+};
+
 export default function HabitForm({ habitItem }: { habitItem?: HabitItem }) {
 
   const schema = habitItem
@@ -29,18 +41,20 @@ export default function HabitForm({ habitItem }: { habitItem?: HabitItem }) {
       startDate: z.date().optional(),
     })
     : z.object({
-      title: z.string().min(1, { message: 'Required' }),
-      startDate: z.date().min(1, { message: 'Required' }),
+      title: z.string().optional(),
+      startDate: z.date().optional(),
     });
 
   const {
     register,
     handleSubmit,
     setValue,
+    setError,
     reset,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
+    shouldUnregister: true,
   })
 
   const { addHabit, editHabit } = useHabit();
@@ -48,13 +62,49 @@ export default function HabitForm({ habitItem }: { habitItem?: HabitItem }) {
   const onSubmit = async (input: { [key: string]: string | Date }) => {
 
     if (habitItem) {
-      await editHabit(input, habitItem.id);
-      (document.getElementById('edit_modal') as HTMLFormElement).close()
+      const error = await editHabit(input, habitItem.id);
+      if (error) {
+
+        error.forEach((value: inputError) => {
+          if (value.field === "json") {
+            document.getElementById("error-modal")?.click();
+          } else {
+            error.forEach((value: inputError) => {
+              const fieldName = snakeToCamel(value.field.trim());
+              setError(fieldName as keyof FormValues, {
+                type: "manual",
+                message: errorTranslate[value.error] || "Something went wrong",
+              });
+            });
+          }
+        });
+      } else {
+        (document.getElementById('edit_modal') as HTMLFormElement).close()
+      }
+
+
     } else {
-      await addHabit(input)
-      reset();
-      setStartDate(undefined);
-      (document.getElementById('add_modal') as HTMLFormElement).close()
+      const error = await addHabit(input)
+
+      if (error) {
+        error.forEach((value: inputError) => {
+          if (value.field === "json") {
+            document.getElementById("error-modal")?.click();
+          } else {
+            error.forEach((value: inputError) => {
+              const fieldName = snakeToCamel(value.field.trim());
+              setError(fieldName as keyof FormValues, {
+                type: "manual",
+                message: errorTranslate[value.error] || "Something went wrong",
+              });
+            });
+          }
+        });
+      } else {
+        reset();
+        setStartDate(undefined);
+        (document.getElementById('add_modal') as HTMLFormElement).close()
+      }
     }
 
   }
@@ -101,7 +151,7 @@ export default function HabitForm({ habitItem }: { habitItem?: HabitItem }) {
                       onSelect={(selectedDate) => {
                         if (selectedDate) {
                           setStartDate(selectedDate)
-                          setValue("startDate", selectedDate)
+                          setValue("startDate", selectedDate, { shouldValidate: true })
                         }
                       }}
                       disabled={{ after: new Date() }}
@@ -118,3 +168,4 @@ export default function HabitForm({ habitItem }: { habitItem?: HabitItem }) {
     </div>
   )
 }
+
