@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { useHabit } from "@/contexts/HabitContext";
 import HabitForm from "./form/HabitForm"
@@ -26,6 +26,12 @@ export default function HabitList() {
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     return diffDays;
   };
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages === 0 ? 1 : totalPages);
+    }
+  }, [habits.length, totalPages, currentPage]);
 
   return (
     <>
@@ -89,23 +95,26 @@ export default function HabitList() {
             : <div className="my-16 mx-auto text-center">No data available.</div>
         }
         <div className="text-center mt-12">
-          <div className="text-center join mx-auto my-4">
-            <button
-              className="join-item btn"
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((prev) => prev - 1)}
-            >
-              PREV
-            </button>
-            <button
-              className="join-item btn"
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((prev) => prev + 1)}
-            >
-              NEXT
-            </button>
-          </div>
-          <div className="mb-8">{currentPage}/{totalPages}</div>
+          {
+            Array.isArray(habits) && habits.length > 0 && <><div className="text-center join mx-auto my-4">
+              <button
+                className="join-item btn"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              >
+                PREV
+              </button>
+              <button
+                className="join-item btn"
+                disabled={currentPage === totalPages || totalPages === 0}
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              >
+                NEXT
+              </button>
+            </div>
+              <div className="mb-8">{currentPage}/{(totalPages < 1 ? 1 : totalPages)}</div>
+            </>
+          }
         </div>
       </div>
       <dialog id="edit_modal" className="modal">
