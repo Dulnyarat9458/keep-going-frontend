@@ -9,11 +9,12 @@ import { errorTranslate } from '@/constants/errorMessages';
 import { snakeToCamel } from '@/utils/caseConverter';
 import { inputError, SignInFormInput } from '@/types/form';
 import { SignInSchema } from '@/schemas/forms';
+import { useAuth } from '@/contexts/AuthContext';
 
 
 export default function SignInForm() {
-
   const router = useRouter();
+  const { signIn } = useAuth();
   const searchParams = useSearchParams();
   const message = searchParams.get('message');
   const [loading, setLoading] = useState(false);
@@ -32,42 +33,36 @@ export default function SignInForm() {
 
   const onSubmit = async (input: { [key: string]: string }) => {
     setLoading(true);
-    const data = await fetch('api/signin',
-      {
-        method: 'POST',
-        credentials: 'include',
-        body: JSON.stringify({
-          email: input.email,
-          password: input.password,
-        }),
-      }
-    )
-
-    if (data.status === 200) {
-      router.push('/');
-    } else {
-      const posts = await data.json()
-      if (Array.isArray(posts)) {
-        posts.forEach((value: inputError) => {
+    const error = await signIn(input);
+    if (error) {
+      if (Array.isArray(error)) {
+        (error as inputError[]).forEach((value) => {
           if (value.field === "json") {
             document.getElementById("error-modal")?.click();
           } else {
-            setError(snakeToCamel(value.field) as keyof SignInFormInput, {
+            const fieldName = snakeToCamel(value.field.trim());
+            setError(fieldName as keyof SignInFormInput, {
               type: "manual",
               message: errorTranslate[value.error as string] || "Something went wrong",
             });
           }
         });
       } else {
-        if (posts.field === "json") {
+        const singleError = error as inputError;
+        if (singleError.field === "json") {
           document.getElementById("error-modal")?.click();
         } else {
-          setError(snakeToCamel(posts.field) as keyof SignInFormInput, {
+          const fieldName = snakeToCamel(singleError.field.trim());
+          setError(fieldName as keyof SignInFormInput, {
             type: "manual",
-            message: errorTranslate[posts.error as string] || "Something went wrong",
+            message: errorTranslate[singleError.error as string] || "Something went wrong",
           });
         }
       }
+      setLoading(false);
+      return;
+    } else {
+      router.push('/');
     }
     setLoading(false);
   }

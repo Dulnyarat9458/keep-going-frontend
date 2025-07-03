@@ -2,10 +2,15 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
+import { inputError } from '@/types/form'
 
 interface AuthContextType {
   userInfo: UserInfo
-  logout: () => void
+  signOut: () => void
+  signIn: (input: { [key: string]: string | Date }) => Promise<inputError[] | null>
+  signUp: (input: { [key: string]: string | Date }) => Promise<inputError[] | null>
+  resetPassword: (input: { token: string | null, password: string }) => Promise<Response>
+  forgetPassword: (input: { email: string }) => Promise<Response>
 }
 
 interface UserInfo {
@@ -42,7 +47,71 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return data
   }
 
-  const logout = async () => {
+  const signIn = async (input: { [key: string]: string | Date }): Promise<inputError[] | null> => {
+    const data = await fetch('api/signin',
+      {
+        method: 'POST',
+        credentials: 'include',
+        body: JSON.stringify({
+          email: input.email,
+          password: input.password,
+        }),
+      }
+    );
+    if (data.status === 200) {
+      return null
+    } else {
+      const errors = await data.json();
+      return errors as inputError[];
+    }
+  }
+
+  const signUp = async (input: { [key: string]: string | Date }): Promise<inputError[] | null> => {
+    const data = await fetch('api/signup',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          first_name: input.firstName,
+          last_name: input.lastName,
+          email: input.email,
+          password: input.password,
+        }),
+      }
+    )
+
+    if (data.status === 200) {
+      router.push('/signin?message=signup_success');
+      return null;
+    } else {
+      const errors = await data.json();
+      if (Array.isArray(errors)) {
+        return errors as inputError[];
+      } else {
+        return [errors as inputError];
+      }
+    }
+  }
+
+  const resetPassword = async (input: { token: string | null, password: string }) => {
+    return await fetch('api/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({
+        token: input.token,
+        password: input.password,
+      }),
+    });
+  };
+
+  const forgetPassword = async (input: { email: string }) => {
+    return await fetch('api/forget-password', {
+      method: 'POST',
+      body: JSON.stringify({
+        email: input.email,
+      }),
+    });
+  };
+
+  const signOut = async () => {
     const data = await fetch(`api/signout`,
       {
         method: 'POST',
@@ -82,7 +151,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 
   return (
-    <AuthContext.Provider value={{ userInfo, logout }}>
+    <AuthContext.Provider value={{ userInfo, signOut, signIn, signUp, resetPassword, forgetPassword }}>
       {children}
     </AuthContext.Provider>
   )

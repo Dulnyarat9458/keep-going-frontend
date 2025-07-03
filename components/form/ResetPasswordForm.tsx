@@ -9,17 +9,16 @@ import { errorTranslate } from '@/constants/errorMessages';
 import { snakeToCamel } from '@/utils/caseConverter';
 import { inputError, ResetPasswordFormInput } from '@/types/form';
 import { ResetPasswordSchema } from '@/schemas/forms';
+import { useAuth } from '@/contexts/AuthContext';
 
 
 export default function ResetPasswordForm() {
-  // Hooks
+  const { resetPassword } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  // Schema
   const schema = ResetPasswordSchema;
 
-  // Form
   const {
     register,
     handleSubmit,
@@ -29,34 +28,40 @@ export default function ResetPasswordForm() {
     resolver: zodResolver(schema),
   });
 
-  // Handlers
   const onSubmit = async (input: { [key: string]: string }) => {
     setLoading(true);
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get("token");
-    const data = await fetch('api/reset-password', {
-      method: 'POST',
-      body: JSON.stringify({
-        token: token,
-        password: input.password,
-      }),
+    const response = await resetPassword({
+      token: new URLSearchParams(window.location.search).get("token"),
+      password: input.password,
     });
 
-    const posts = await data.json();
-
-    if (data.status === 200) {
+    if (response && response.status === 200) {
       router.push('/signin?message=signup_success');
     } else {
-      posts.forEach((value: inputError) => {
-        if (value.field === "json") {
+      const error = await response.json();
+      if (Array.isArray(error)) {
+        error.forEach((value: inputError) => {
+          if (value.field === "json") {
+            document.getElementById("error-modal")?.click();
+          } else {
+            const fieldName = snakeToCamel(value.field.trim());
+            setError(fieldName as keyof ResetPasswordFormInput, {
+              type: "manual",
+              message: errorTranslate[value.error as string] || "Something went wrong",
+            });
+          }
+        });
+      } else {
+        if (error.field === "json") {
           document.getElementById("error-modal")?.click();
         } else {
-          setError(snakeToCamel(value.field) as keyof ResetPasswordFormInput, {
+          const fieldName = snakeToCamel(error.field.trim());
+          setError(fieldName as keyof ResetPasswordFormInput, {
             type: "manual",
-            message: errorTranslate[value.error as string] || "Something went wrong",
+            message: errorTranslate[error.error as string] || "Something went wrong",
           });
         }
-      });
+      }
     }
     setLoading(false);
   };

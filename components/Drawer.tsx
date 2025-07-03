@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { UserInfo } from '@/types/user';
 
 export default function Drawer({ userInfo }: { userInfo: UserInfo }) {
-  const { logout } = useAuth();
+  const { signOut } = useAuth();
 
   return (
     <div className="drawer">
@@ -29,19 +29,9 @@ export default function Drawer({ userInfo }: { userInfo: UserInfo }) {
             </div>
           </div>
           <li className="mb-1">
-            <button onClick={logout} className='text-error'>Log Out</button>
+            <button onClick={signOut} className='text-error'>Log Out</button>
           </li>
         </ul>
-      </div>
-      <input type="checkbox" id="error-modal" className="modal-toggle" />
-      <div className="modal">
-        <div className="modal-box">
-          <h3 className="font-bold text-lg text-error">Error</h3>
-          <p className="py-4">Something went wrong.</p>
-          <div className="modal-action">
-            <label htmlFor="error-modal" className="btn">Close</label>
-          </div>
-        </div>
       </div>
     </div>
   )
