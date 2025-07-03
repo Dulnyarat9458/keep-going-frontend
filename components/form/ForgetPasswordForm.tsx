@@ -8,13 +8,15 @@ import { errorTranslate } from '@/constants/errorMessages';
 import { snakeToCamel } from '@/utils/caseConverter';
 import { ForgetPasswordFormInput, inputError } from '@/types/form';
 import { ForgetPasswordSchema } from '@/schemas/forms';
+import { useAuth } from '@/contexts/AuthContext';
 
 
 export default function ForgetPasswordForm() {
+  const { forgetPassword } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const schema = ForgetPasswordSchema
+  const schema = ForgetPasswordSchema;
 
   const {
     register,
@@ -23,41 +25,35 @@ export default function ForgetPasswordForm() {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
-  })
+  });
 
   const onSubmit = async (input: { [key: string]: string }) => {
     setLoading(true);
-    const data = await fetch('api/forget-password',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          email: input.email,
-        }),
-      }
-    )
-
-    if (data.status === 200) {
+    const response = await forgetPassword({ email: input.email });
+    if (response && response.status === 200) {
       router.push('/signin?message=sended reset password');
     } else {
-      const posts = await data.json()
-      if (Array.isArray(posts)) {
-        posts.forEach((value: inputError) => {
+      const error = await response.json();
+      if (Array.isArray(error)) {
+        error.forEach((value: inputError) => {
           if (value.field === "json") {
             document.getElementById("error-modal")?.click();
           } else {
-            setError(snakeToCamel(value.field) as keyof ForgetPasswordFormInput, {
+            const fieldName = snakeToCamel(value.field.trim());
+            setError(fieldName as keyof ForgetPasswordFormInput, {
               type: "manual",
               message: errorTranslate[value.error as string] || "Something went wrong",
             });
           }
         });
       } else {
-        if (posts.field === "json") {
+        if (error.field === "json") {
           document.getElementById("error-modal")?.click();
         } else {
-          setError(snakeToCamel(posts.field) as keyof ForgetPasswordFormInput, {
+          const fieldName = snakeToCamel(error.field.trim());
+          setError(fieldName as keyof ForgetPasswordFormInput, {
             type: "manual",
-            message: errorTranslate[posts.error as string] || "Something went wrong",
+            message: errorTranslate[error.error as string] || "Something went wrong",
           });
         }
       }

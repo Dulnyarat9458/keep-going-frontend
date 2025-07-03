@@ -26,15 +26,6 @@ export default function Navbar() {
           <div className='mr-4 hidden lg:block'>{userInfo.firstName} {userInfo.lastName}</div>
         </div>
       </div>
-      <div className="modal">
-        <div className="modal-box">
-          <h3 className="font-bold text-lg text-error">Error</h3>
-          <p className="py-4">Something went wrong.</p>
-          <div className="modal-action">
-            <label htmlFor="error-modal" className="btn">Close</label>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }

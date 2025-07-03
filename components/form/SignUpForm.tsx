@@ -11,12 +11,12 @@ import { snakeToCamel } from '@/utils/caseConverter'
 import { errorTranslate } from '@/constants/errorMessages';
 import { inputError, SignUpFormInput } from '@/types/form';
 import { SignUpSchema } from '@/schemas/forms';
+import { useAuth } from '@/contexts/AuthContext';
 
 
 export default function SignUpForm() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
-
+  const { signUp } = useAuth();
   const schema = SignUpSchema
 
   const {
@@ -28,40 +28,37 @@ export default function SignUpForm() {
     resolver: zodResolver(schema),
   })
 
-
   const onSubmit = async (input: { [key: string]: string }) => {
     setLoading(true);
-    const data = await fetch('api/signup',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          first_name: input.firstName,
-          last_name: input.lastName,
-          email: input.email,
-          password: input.password,
-        }),
-      }
-    )
-
-    const posts = await data.json()
-
-    if (data.status === 200) {
-      router.push('/signin?message=signup_success');
-    } else {
-      posts.forEach((value: inputError) => {
-        if (value.field === "json") {
+    const error = await signUp(input);
+    if (error) {
+      if (Array.isArray(error)) {
+        error.forEach((value: inputError) => {
+          if (value.field === "json") {
+            document.getElementById("error-modal")?.click();
+          } else {
+            const fieldName = snakeToCamel(value.field.trim());
+            setError(fieldName as keyof SignUpFormInput, {
+              type: "manual",
+              message: errorTranslate[value.error as string] || "Something went wrong",
+            });
+          }
+        });
+      } else {
+        const singleError = error as inputError;
+        if (singleError.field === "json") {
           document.getElementById("error-modal")?.click();
         } else {
-          setError(snakeToCamel(value.field) as keyof SignUpFormInput, {
+          const fieldName = snakeToCamel(singleError.field.trim());
+          setError(fieldName as keyof SignUpFormInput, {
             type: "manual",
-            message: errorTranslate[value.error as string] || "Something went wrong",
+            message: errorTranslate[singleError.error as string] || "Something went wrong",
           });
         }
-      });
+      }
     }
     setLoading(false);
   }
-
 
   return (
     <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 m-auto">
@@ -137,16 +134,6 @@ export default function SignUpForm() {
           <Link href={"/signin"} type='submit' className='link link-primary ml-1'>Sign In</Link>
         </p>
       </form>
-      <input type="checkbox" id="error-modal" className="modal-toggle" />
-      <div className="modal">
-        <div className="modal-box">
-          <h3 className="font-bold text-lg text-error">Error</h3>
-          <p className="py-4">Something went wrong.</p>
-          <div className="modal-action">
-            <label htmlFor="error-modal" className="btn">Close</label>
-          </div>
-        </div>
-      </div>
     </fieldset>
   )
 }

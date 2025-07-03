@@ -33,36 +33,32 @@ export default function HabitForm({ habitItem }: { habitItem?: HabitItem }) {
           if (value.field === "json") {
             document.getElementById("error-modal")?.click();
           } else {
-            error.forEach((value: inputError) => {
-              const fieldName = snakeToCamel(value.field.trim());
-              setError(fieldName as keyof HabitInput, {
-                type: "manual",
-                message: errorTranslate[value.error] || "Something went wrong",
-              });
+            const fieldName = snakeToCamel(value.field.trim());
+            setError(fieldName as keyof HabitInput, {
+              type: "manual",
+              message: errorTranslate[value.error] || "Something went wrong",
             });
           }
         });
       } else {
-        (document.getElementById('edit_modal') as HTMLFormElement).close()
+        (document.getElementById('edit_modal') as HTMLFormElement).close();
       }
     } else {
-      const error = await addHabit(input)
+      const error = await addHabit(input);
       if (error) {
         error.forEach((value: inputError) => {
           if (value.field === "json") {
             document.getElementById("error-modal")?.click();
           } else {
-            error.forEach((value: inputError) => {
-              const fieldName = snakeToCamel(value.field.trim());
-              setError(fieldName as keyof HabitInput, {
-                type: "manual",
-                message: errorTranslate[value.error] || "Something went wrong",
-              });
+            const fieldName = snakeToCamel(value.field.trim());
+            setError(fieldName as keyof HabitInput, {
+              type: "manual",
+              message: errorTranslate[value.error] || "Something went wrong",
             });
           }
         });
       } else {
-        (document.getElementById('add_modal') as HTMLFormElement).close()
+        (document.getElementById('add_modal') as HTMLFormElement).close();
       }
     }
   }
