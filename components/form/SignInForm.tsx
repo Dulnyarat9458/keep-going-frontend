@@ -38,6 +38,10 @@ export default function SignInForm() {
       if (Array.isArray(error)) {
         (error as inputError[]).forEach((value) => {
           if (value.field === "json") {
+            const errorText = document.getElementById("error-modal-text");
+            if (errorText) {
+              errorText.innerHTML = "Something went wrong.";
+            }
             document.getElementById("error-modal")?.click();
           } else {
             const fieldName = snakeToCamel(value.field.trim());
@@ -50,6 +54,10 @@ export default function SignInForm() {
       } else {
         const singleError = error as inputError;
         if (singleError.field === "json") {
+          const errorText = document.getElementById("error-modal-text");
+          if (errorText) {
+            errorText.innerHTML = "Something went wrong.";
+          }
           document.getElementById("error-modal")?.click();
         } else {
           const fieldName = snakeToCamel(singleError.field.trim());
@@ -69,10 +77,15 @@ export default function SignInForm() {
 
   useEffect(() => {
     if (message) {
-      const modal = document.getElementById("success-modal") as HTMLInputElement
-      if (modal) {
-        modal.checked = true
+      const successText = document.getElementById("success-modal-text");
+      if (successText) {
+        if (message === "signup_success") {
+          successText.innerHTML = "Sign up successful! Please sign in.";
+        } else {
+          successText.innerHTML = message;
+        }
       }
+      document.getElementById("success-modal")?.click();
     }
   }, [message])
 
@@ -115,26 +128,6 @@ export default function SignInForm() {
         Don't have an Account?
         <Link href={"/signup"} className='link link-primary ml-1'>Sign Up</Link>
       </p>
-      <input type="checkbox" id="error-modal" className="modal-toggle" />
-      <div className="modal">
-        <div className="modal-box">
-          <h3 className="font-bold text-lg text-error">Error</h3>
-          <p className="py-4">Something went wrong.</p>
-          <div className="modal-action">
-            <label htmlFor="error-modal" className="btn">Close</label>
-          </div>
-        </div>
-      </div>
-      <input type="checkbox" id="success-modal" className="modal-toggle" />
-      <div className="modal">
-        <div className="modal-box">
-          <h3 className="font-bold text-lg text-success">Success</h3>
-          <p className="py-4">Register Success</p>
-          <div className="modal-action">
-            <label htmlFor="success-modal" className="btn">Close</label>
-          </div>
-        </div>
-      </div>
     </fieldset>
   )
 }

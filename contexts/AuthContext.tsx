@@ -121,6 +121,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (data.status === 200) {
       router.push('/signin');
     } else {
+      const errorText = document.getElementById("error-modal-text");
+      if (errorText) {
+        errorText.innerHTML = "Sign out failed.";
+      }
       document.getElementById("error-modal")?.click();
     }
   }
@@ -142,6 +146,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             router.push('/signin');
           }
         } else {
+          const errorText = document.getElementById("error-modal-text");
+          if (errorText) {
+            errorText.innerHTML = "Something went wrong.";
+          }
           document.getElementById("error-modal")?.click();
         }
       }
@@ -153,6 +161,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return (
     <AuthContext.Provider value={{ userInfo, signOut, signIn, signUp, resetPassword, forgetPassword }}>
       {children}
+      <input type="checkbox" id="success-modal" className="modal-toggle" />
+      <div className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg text-success">Success</h3>
+          <p className="py-4" id="success-modal-text"></p>
+          <div className="modal-action">
+            <label htmlFor="success-modal" className="btn">Close</label>
+          </div>
+        </div>
+      </div>
+      <input type="checkbox" id="error-modal" className="modal-toggle" />
+      <div className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg text-error">Error</h3>
+          <p className="py-4" id="error-modal-text"></p>
+          <div className="modal-action">
+            <label htmlFor="error-modal" className="btn">Close</label>
+          </div>
+        </div>
+      </div>
     </AuthContext.Provider>
   )
 }
