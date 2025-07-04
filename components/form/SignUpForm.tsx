@@ -35,6 +35,10 @@ export default function SignUpForm() {
       if (Array.isArray(error)) {
         error.forEach((value: inputError) => {
           if (value.field === "json") {
+            const errorText = document.getElementById("error-modal-text");
+            if (errorText) {
+              errorText.innerHTML = "Something went wrong.";
+            }
             document.getElementById("error-modal")?.click();
           } else {
             const fieldName = snakeToCamel(value.field.trim());
@@ -47,6 +51,10 @@ export default function SignUpForm() {
       } else {
         const singleError = error as inputError;
         if (singleError.field === "json") {
+          const errorText = document.getElementById("error-modal-text");
+          if (errorText) {
+            errorText.innerHTML = "Something went wrong.";
+          }
           document.getElementById("error-modal")?.click();
         } else {
           const fieldName = snakeToCamel(singleError.field.trim());
@@ -56,6 +64,12 @@ export default function SignUpForm() {
           });
         }
       }
+    } else {
+      const successText = document.getElementById("success-modal-text");
+      if (successText) {
+        successText.innerHTML = "Sign up successful! Please sign in.";
+      }
+      document.getElementById("success-modal")?.click();
     }
     setLoading(false);
   }

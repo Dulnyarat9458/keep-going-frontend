@@ -13,7 +13,6 @@ interface HabitItem {
   updated_at: Date
 }
 
-
 interface HabitContextType {
   habits: HabitItem[]
   addHabit: (input: { [key: string]: string | Date }) => Promise<inputError[] | null>
@@ -80,16 +79,28 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
       handleHabitList(res);
       const text = document.getElementById("success-modal-text");
       if (text) {
-        text.innerHTML = "Reset habit successfully";
+        text.innerHTML = "Delete habit successfully";
       }
-      (document.getElementById("confirm-modal") as HTMLInputElement).checked = false;
-      (document.getElementById("success-modal") as HTMLInputElement).checked = true;
+      (document.getElementById("confirm-modal-close") as HTMLElement)?.click();
+      document.getElementById("success-modal")?.click();
     } else {
-      const text = document.getElementById("error-modal-text");
-      if (text) {
-        text.innerHTML = "Reset failed.";
+      let errorMsg = "Something went wrong.";
+      if (data.status === 403) {
+        errorMsg = "You do not have permission to delete this habit.";
+      } else if (data.status === 404) {
+        errorMsg = "Habit not found.";
+      } else if (data.status === 500) {
+        errorMsg = "Server error. Please try again later.";
+      } else {
+        try {
+          const err = await data.json();
+          if (err && err.error) errorMsg = err.error;
+        } catch {}
       }
-      (document.getElementById("error-modal") as HTMLInputElement).checked = true;
+      const errorText = document.getElementById("error-modal-text");
+      if (errorText) errorText.innerHTML = errorMsg;
+      (document.getElementById("confirm-modal-close") as HTMLElement)?.click();
+      document.getElementById("error-modal")?.click();
     }
   }
 
@@ -109,14 +120,26 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
       if (text) {
         text.innerHTML = "Reset habit successfully";
       }
-      (document.getElementById("confirm-modal") as HTMLInputElement).checked = false;
-      (document.getElementById("success-modal") as HTMLInputElement).checked = true;
+      (document.getElementById("confirm-modal-close") as HTMLElement)?.click();
+      document.getElementById("success-modal")?.click();
     } else {
-      const text = document.getElementById("error-modal-text");
-      if (text) {
-        text.innerHTML = "Reset failed.";
+      let errorMsg = "Something went wrong.";
+      if (data.status === 403) {
+        errorMsg = "You do not have permission to reset this habit.";
+      } else if (data.status === 404) {
+        errorMsg = "Habit not found.";
+      } else if (data.status === 500) {
+        errorMsg = "Server error. Please try again later.";
+      } else {
+        try {
+          const err = await data.json();
+          if (err && err.error) errorMsg = err.error;
+        } catch {}
       }
-      (document.getElementById("error-modal") as HTMLInputElement).checked = true;
+      const errorText = document.getElementById("error-modal-text");
+      if (errorText) errorText.innerHTML = errorMsg;
+      (document.getElementById("confirm-modal-close") as HTMLElement)?.click();
+      document.getElementById("error-modal")?.click();
     }
   }
 
@@ -138,14 +161,30 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
     if (data.status === 200) {
       const data = await fetchHabits();
       handleHabitList(data)
-      document.getElementById("success-modal")?.click();
-      const text = document.getElementById("success-modal-text")!;
+      const text = document.getElementById("success-modal-text");
       if (text) {
         text.innerHTML = "Add habit successfully";
       }
+      document.getElementById("success-modal")?.click();
       return null
     } else {
-      return data.json()
+      let errorMsg = "Something went wrong.";
+      if (data.status === 403) {
+        errorMsg = "You do not have permission to add a habit.";
+      } else if (data.status === 404) {
+        errorMsg = "Resource not found.";
+      } else if (data.status === 500) {
+        errorMsg = "Server error. Please try again later.";
+      } else {
+        try {
+          const err = await data.json();
+          if (err && err.error) errorMsg = err.error;
+        } catch {}
+      }
+      const errorText = document.getElementById("error-modal-text");
+      if (errorText) errorText.innerHTML = errorMsg;
+      document.getElementById("error-modal")?.click();
+      return null;
     }
   }
 
@@ -163,15 +202,30 @@ export function HabitProvider({ children }: { children: React.ReactNode }) {
     if (data.status === 200) {
       const data = await fetchHabits();
       handleHabitList(data)
-      document.getElementById("success-modal")?.click();
-      const text = document.getElementById("success-modal-text")!;
+      const text = document.getElementById("success-modal-text");
       if (text) {
         text.innerHTML = "Edit habit successfully";
       }
+      document.getElementById("success-modal")?.click();
       return null
     } else {
-      return data.json()
-      // document.getElementById("error-modal")?.click();
+      let errorMsg = "Something went wrong.";
+      if (data.status === 403) {
+        errorMsg = "You do not have permission to edit this habit.";
+      } else if (data.status === 404) {
+        errorMsg = "Habit not found.";
+      } else if (data.status === 500) {
+        errorMsg = "Server error. Please try again later.";
+      } else {
+        try {
+          const err = await data.json();
+          if (err && err.error) errorMsg = err.error;
+        } catch {}
+      }
+      const errorText = document.getElementById("error-modal-text");
+      if (errorText) errorText.innerHTML = errorMsg;
+      document.getElementById("error-modal")?.click();
+      return null;
     }
   }
 

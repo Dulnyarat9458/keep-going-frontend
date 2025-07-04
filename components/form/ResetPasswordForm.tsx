@@ -36,12 +36,21 @@ export default function ResetPasswordForm() {
     });
 
     if (response && response.status === 200) {
-      router.push('/signin?message=signup_success');
+      const successText = document.getElementById("success-modal-text");
+      if (successText) {
+        successText.innerHTML = "Password reset successful! Please sign in.";
+      }
+      document.getElementById("success-modal")?.click();
+      setTimeout(() => router.push('/signin'), 1500);
     } else {
       const error = await response.json();
       if (Array.isArray(error)) {
         error.forEach((value: inputError) => {
           if (value.field === "json") {
+            const errorText = document.getElementById("error-modal-text");
+            if (errorText) {
+              errorText.innerHTML = "Something went wrong.";
+            }
             document.getElementById("error-modal")?.click();
           } else {
             const fieldName = snakeToCamel(value.field.trim());
@@ -53,6 +62,10 @@ export default function ResetPasswordForm() {
         });
       } else {
         if (error.field === "json") {
+          const errorText = document.getElementById("error-modal-text");
+          if (errorText) {
+            errorText.innerHTML = "Something went wrong.";
+          }
           document.getElementById("error-modal")?.click();
         } else {
           const fieldName = snakeToCamel(error.field.trim());
@@ -100,16 +113,6 @@ export default function ResetPasswordForm() {
           }
         </button>
       </form>
-      <input type="checkbox" id="error-modal" className="modal-toggle" />
-      <div className="modal">
-        <div className="modal-box">
-          <h3 className="font-bold text-lg text-error">Error</h3>
-          <p className="py-4">Something went wrong.</p>
-          <div className="modal-action">
-            <label htmlFor="error-modal" className="btn">Close</label>
-          </div>
-        </div>
-      </div>
     </fieldset>
   );
 }
