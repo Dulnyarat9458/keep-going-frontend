@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext';
 import Drawer from './Drawer'
 import { anonymousPath } from '@/constants/anonymousPath';
+import { useRedirectIfAuthenticated } from '@/utils/useRedirectIfAuthenticated';
 
 const mustShowDrawer = (path: string) => {
   return !anonymousPath.includes(path)
@@ -14,6 +15,7 @@ const mustShowDrawer = (path: string) => {
 export default function Navbar() {
   const pathname = usePathname()
   const { userInfo } = useAuth();
+  useRedirectIfAuthenticated(userInfo);
 
   return (
     <div className="navbar sticky top-0 z-10 shadow-sm bg-base-300">
