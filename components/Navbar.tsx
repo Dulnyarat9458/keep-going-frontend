@@ -24,7 +24,7 @@ export default function Navbar() {
       </div>
       <div className="flex-1">
         <div className='flex items-center justify-between'>
-          <Link href={"/"} className="btn btn-ghost text-xl">MY HABITS</Link>
+          <Link href={"/"} className="btn btn-ghost text-xl">KEEP GOING</Link>
           <div className='mr-4 hidden lg:block'>{userInfo.firstName} {userInfo.lastName}</div>
         </div>
       </div>
